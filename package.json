@@ -106,7 +106,7 @@
     "@testcontainers/postgresql": "^12.1.0",
     "@types/node": "^26.2.0",
     "@types/pg": "^8.23.1",
-    "ai": "^7.0.69",
+    "ai": "^7.0.77",
     "pg": "^8.23.0",
     "pg-boss": "^12.27.0",
     "simple-git-hooks": "^2.13.1",
