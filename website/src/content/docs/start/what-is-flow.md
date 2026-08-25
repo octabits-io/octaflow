@@ -47,7 +47,7 @@ publish      type=publish    deps: summarize, translate
 This is the core design choice. Flow is **declarative**, where Temporal, Inngest, Trigger.dev
 and DBOS are **imperative**: there you write a function, and the graph exists only as the trace
 of what it did. Both models are durable — they trade off differently, and
-[the tradeoff is spelled out below](/octaflow/start/how-it-compares/).
+[the tradeoff is spelled out below](/start/how-it-compares/).
 
 ## Features
 

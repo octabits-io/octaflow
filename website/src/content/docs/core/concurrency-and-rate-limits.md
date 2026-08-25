@@ -86,5 +86,5 @@ interface StepGate {
 // decision: { admitted: true, release } | { admitted: false, retryAfterSeconds }
 ```
 
-For [map steps](/octaflow/core/fan-out-and-map/), cap the **child** type (`myMap__item`), not
+For [map steps](/core/fan-out-and-map/), cap the **child** type (`myMap__item`), not
 the parent — the parent runs once to produce the list, the children are the fan-out.

@@ -26,7 +26,7 @@ Engine methods: `validateDefinition`, `startWorkflow`, `start`, `handleStepJob`,
 `cancelWorkflow`, `getWorkflowStatus`, `listWorkflows`.
 
 :::note[Workers call `handleStepJob`]
-A queue carries both step runs and the [wait deadlines](/octaflow/core/deadlines/) of
+A queue carries both step runs and the [wait deadlines](/core/deadlines/) of
 suspended steps. `handleStepJob(payload)` routes on the payload's `kind` and calls
 `executeStep` or `timeoutStep` for you; the other two remain public for direct use and tests.
 :::
@@ -44,13 +44,13 @@ suspended steps. `handleStepJob(payload)` routes on the payload's `kind` and cal
 *(type)* `JoinRule`, `StepConditionHandler`, `WaitTimeoutPolicy`
 
 Step-level policy lives on the registration: `when` / `join`
-([branching](/octaflow/core/branching/)), `timeoutMs` / `onTimeout`
-([deadlines](/octaflow/core/deadlines/)), `heartbeatTimeoutMs` / `heartbeat`
-([heartbeats](/octaflow/core/heartbeats/)). `ctx.heartbeat()` is on
+([branching](/core/branching/)), `timeoutMs` / `onTimeout`
+([deadlines](/core/deadlines/)), `heartbeatTimeoutMs` / `heartbeat`
+([heartbeats](/core/heartbeats/)). `ctx.heartbeat()` is on
 `StepExecutionContext` and `TypedStepContext`.
 
 `computeReadiness`, `isTerminalStepStatus` — the pure readiness rules behind
-[`when` and `join`](/octaflow/core/branching/); exported so a custom store's tests can assert
+[`when` and `join`](/core/branching/); exported so a custom store's tests can assert
 against the same logic the engine uses.
 
 ### Retryability
@@ -167,7 +167,7 @@ before routing to a partition's engine.
 
 `StartJobContext` is what a start worker hands its processor — the wire payload plus `jobId` and
 a **per-delivery** `idempotencyKey`, computed by `resolveStartIdempotencyKey` (exported so you
-can reproduce it). See [cron idempotency](/octaflow/running/postgres-and-pg-boss/#cron-idempotency).
+can reproduce it). See [cron idempotency](/running/postgres-and-pg-boss/#cron-idempotency).
 
 ## `octaflow/ai`
 

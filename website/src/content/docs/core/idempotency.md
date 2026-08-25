@@ -45,7 +45,7 @@ it in `createWorkflow`: when `idempotencyKey` is set and already present, return
 workflow with `alreadyExisted: true` instead of inserting.
 
 Both bundled stores do. `store-pg` relies on a partial unique index that
-[`flowStoreDdl`](/octaflow/running/postgres-and-pg-boss/) creates for you:
+[`flowStoreDdl`](/running/postgres-and-pg-boss/) creates for you:
 
 ```sql
 CREATE UNIQUE INDEX flow_workflow_idempotency_idx
@@ -60,5 +60,5 @@ the same key resolve to one workflow at the database level — not merely "usual
 A schedule stores its payload once, so a key fixed at schedule time would ride every tick and —
 since keys never expire — collapse them all into the first workflow. Pass
 `idempotencyKeyPrefix` instead and the start worker resolves it per delivery. See
-[cron idempotency](/octaflow/running/postgres-and-pg-boss/#cron-idempotency).
+[cron idempotency](/running/postgres-and-pg-boss/#cron-idempotency).
 :::

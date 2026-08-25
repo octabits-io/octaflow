@@ -60,7 +60,7 @@ your event can beat the DAG, persist it and replay after the `step.waiting` even
 ## Bounding the wait
 
 By default a `waiting` step waits indefinitely — it is **not** swept by
-[`recoverStuckWorkflows`](/octaflow/running/cancellation-and-recovery/), which only looks at
+[`recoverStuckWorkflows`](/running/cancellation-and-recovery/), which only looks at
 steps stuck in `running`. Three ways to bound it:
 
 - **Give it a deadline.** `timeoutMs` plus `onTimeout` is the built-in answer, and the one you
@@ -75,7 +75,7 @@ steps stuck in `running`. Three ways to bound it:
   });
   ```
 
-  See [Deadlines](/octaflow/core/deadlines/) — including the worker change it requires
+  See [Deadlines](/core/deadlines/) — including the worker change it requires
   (`engine.handleStepJob`, not `executeStep`).
 - **Bound the whole run.** `StartOptions.timeoutMs` fails the workflow wherever it is,
   suspended included.
@@ -83,6 +83,6 @@ steps stuck in `running`. Three ways to bound it:
   workflow as `cancelled`.
 
 `waiting` folds to the display state `running` in the
-[public view](/octaflow/extending/http/), so a UI shows it as in-flight rather than as its own
+[public view](/extending/http/), so a UI shows it as in-flight rather than as its own
 state. Watch the `step.waiting` and `step.resumed`
-[events](/octaflow/running/observability/) if you need to show "awaiting approval" specifically.
+[events](/running/observability/) if you need to show "awaiting approval" specifically.

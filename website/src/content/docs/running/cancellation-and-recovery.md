@@ -20,11 +20,11 @@ Every `pending` **and `waiting`** step is marked `skipped`, the workflow finishe
 - **It interrupts a running step only if that step beats.** There is no signal into
   an in-flight handler on its own, so by default the step runs to completion and its
   result lands on a workflow that has already finished. A step with a
-  [heartbeat](/octaflow/core/heartbeats/) learns it was cancelled on its next beat:
+  [heartbeat](/core/heartbeats/) learns it was cancelled on its next beat:
   the engine fires `ctx.signal` and discards whatever the handler returns. Without
   one, cancellation remains a "stop scheduling more work" operation, not a kill.
 - **Compensation does not run.** Saga rollback is wired to the *failure* path only
-  (see [Saga compensation](/octaflow/core/saga-compensation/)). If you need completed
+  (see [Saga compensation](/core/saga-compensation/)). If you need completed
   steps undone on a cancel, do it yourself after the call returns.
 - **Cancelling a sub-workflow child fails the parent step**, which cascades into the
   parent workflow exactly as a child failure would.
@@ -51,7 +51,7 @@ It scans every `running` workflow in the partition and does three things:
   provided its attempt budget has room. A dead pod costs an attempt, not the run.
 - **Fails a crashed step** whose budget is spent, cascading the workflow to `failed` in
   the usual way (dependents skipped, compensation run).
-- **Fails a run past its [deadline](/octaflow/core/deadlines/)**, which nothing else
+- **Fails a run past its [deadline](/core/deadlines/)**, which nothing else
   would notice while the run is suspended or idle.
 
 :::caution[Your handlers must tolerate re-execution]
@@ -60,7 +60,7 @@ through its side effects before the worker died. This is the same contract retri
 already impose — but it now applies to crashes too, which it did not before.
 
 Worse, on a *false* positive the re-run is **concurrent** with an original invocation
-that never actually died. A [heartbeat](/octaflow/core/heartbeats/) is what removes
+that never actually died. A [heartbeat](/core/heartbeats/) is what removes
 that case rather than making it unlikely: a live step keeps proving it, and one that
 was superseded anyway finds out on its next beat and discards its outcome.
 
@@ -91,7 +91,7 @@ stuckThreshold = stepExpirySeconds + stuckStepBufferSeconds
 ```
 
 This is the **default** window, measured from when a step started. A step type that
-declares [`heartbeatTimeoutMs`](/octaflow/core/heartbeats/) overrides it with its own,
+declares [`heartbeatTimeoutMs`](/core/heartbeats/) overrides it with its own,
 measured from when the step last reported in — which is what lets the window be short
 without condemning work that is merely slow.
 
@@ -136,7 +136,7 @@ job behind it is invisible to it — that is the dual-write window between persi
 transition and enqueueing the jobs it unlocks.
 
 Closing that window is the job of
-[transactional dispatch](/octaflow/extending/interfaces/#transactional-dispatch): with
+[transactional dispatch](/extending/interfaces/#transactional-dispatch): with
 `store-pg` + `dispatcher-pgboss` on one Postgres, the write and its enqueues commit
 together and the window doesn't exist. On a queue that lives elsewhere (SQS, Redis) the
 engine falls back to write-then-enqueue, and the repair path is the dispatcher
@@ -169,7 +169,7 @@ Details worth knowing:
   to happen again — that is why `compensated` is reset alongside `failed` and `skipped`.
 - **A map parent's children are dropped** before it re-runs, so it fans out afresh rather
   than aggregating two generations of items.
-- **A guard is re-evaluated.** A step skipped by a [`when`](/octaflow/core/branching/)
+- **A guard is re-evaluated.** A step skipped by a [`when`](/core/branching/)
   guard is reset too, so the branch decision is made again against the current data.
 - **It refuses a run that is not `failed`.** A `completed`, `running` or `cancelled`
   workflow returns a `workflow_not_retryable` error rather than being restarted.

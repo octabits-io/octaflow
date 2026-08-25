@@ -18,8 +18,8 @@ import { Card, CardGrid, Code } from '@astrojs/starlight/components';
       <span>MIT</span>
     </div>
     <div class="flow-hero__actions">
-      <a class="flow-btn flow-btn--primary" href="/octaflow/start/quick-start/">Quick start →</a>
-      <a class="flow-btn" href="/octaflow/start/how-it-compares/">How it compares</a>
+      <a class="flow-btn flow-btn--primary" href="/start/quick-start/">Quick start →</a>
+      <a class="flow-btn" href="/start/how-it-compares/">How it compares</a>
       <a class="flow-btn" href="https://github.com/octabits-io/octaflow">GitHub</a>
     </div>
   </div>
@@ -70,14 +70,14 @@ A pipeline exercising most of the engine: fan-out over two `map` steps at once, 
 concurrency cap, a retried step, a sub-workflow, a suspend-and-resume on an external
 event, a durable sleep — then a second workflow failing and rolling back in reverse.
 
-<img src="/octaflow/demo.svg" alt="Terminal trace of a publishing pipeline running: parallel fan-out with a concurrency cap, a retried step, a sub-workflow, a suspend-and-resume, a durable sleep, then a saga rollback" />
+<img src="/demo.svg" alt="Terminal trace of a publishing pipeline running: parallel fan-out with a concurrency cap, a retried step, a sub-workflow, a suspend-and-resume, a durable sleep, then a saga rollback" />
 
 Every line is an engine transition emitted through the
-[`FlowObserver`](/octaflow/running/observability/) seam — not a `console.log` in a handler.
+[`FlowObserver`](/running/observability/) seam — not a `console.log` in a handler.
 
 ## Install
 
 <Code code={`pnpm add octaflow zod`} lang="bash" />
 
 `zod` is a required peer; `pg`, `pg-boss`, `ai` and `@ai-sdk/provider` are optional —
-install only what the layers you import need. See [Installation](/octaflow/start/installation/).
+install only what the layers you import need. See [Installation](/start/installation/).

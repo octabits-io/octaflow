@@ -68,7 +68,7 @@ each: async (url) => {
 
 **Every child is enqueued at once.** There is no built-in batching or concurrency limit on the
 fan-out itself — a 10,000-item list means 10,000 queue rows, immediately. What throttles actual
-execution is the [step gate](/octaflow/core/concurrency-and-rate-limits/), keyed on the child's
+execution is the [step gate](/core/concurrency-and-rate-limits/), keyed on the child's
 step type:
 
 ```ts
@@ -86,5 +86,5 @@ on the gate to hold back a queue that large.
 Two more limits worth knowing: the aggregated `{ items: [...] }` output is stored as a single
 row value, so a very large fan-out with large per-item outputs makes a very large row; and map
 fan-out still writes-then-enqueues rather than committing
-[transactionally](/octaflow/extending/interfaces/#transactional-dispatch), relying on job
+[transactionally](/extending/interfaces/#transactional-dispatch), relying on job
 redelivery as its repair path.

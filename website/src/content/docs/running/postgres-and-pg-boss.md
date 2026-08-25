@@ -100,13 +100,13 @@ and its dead-letter queue:
 
 | Field | Default | |
 |---|---|---|
-| `retryLimit` | `2` | Job-level retries before dead-lettering — **separate** from a step's own [`retry` policy](/octaflow/core/retry-and-timeout/#the-other-retry-layer) |
+| `retryLimit` | `2` | Job-level retries before dead-lettering — **separate** from a step's own [`retry` policy](/core/retry-and-timeout/#the-other-retry-layer) |
 | `retryDelay` | `30` | Seconds between those retries |
 | `expireInSeconds` | `600` | How long an in-flight job may occupy a worker |
 
 :::danger[`expireInSeconds` and `stepExpirySeconds` must agree]
 The engine keeps its own copy of the job expiry to compute the
-[stuck-step threshold](/octaflow/running/cancellation-and-recovery/#the-stuck-threshold). It is
+[stuck-step threshold](/running/cancellation-and-recovery/#the-stuck-threshold). It is
 not read from pg-boss — change one and you must change the other:
 
 ```ts
@@ -119,7 +119,7 @@ const engine = createWorkflowEngine({ …, config: { stepExpirySeconds: 900 } })
 ## Don't forget the sweeper
 
 Nothing in this wiring recovers a step whose worker died mid-run. Run
-[`engine.recoverStuckWorkflows()`](/octaflow/running/cancellation-and-recovery/) on a timer in
+[`engine.recoverStuckWorkflows()`](/running/cancellation-and-recovery/) on a timer in
 one process — without it, a crashed step sits in `running` forever and its workflow never
 finishes.
 
@@ -129,7 +129,7 @@ With `store-pg` and `dispatcher-pgboss` on the **same** Postgres, the engine det
 optional capabilities and commits each state change together with the jobs it unlocks —
 closing the crash window that would otherwise strand steps `pending` with no job behind them.
 No configuration; it is on whenever the pair is used together. See
-[transactional dispatch](/octaflow/extending/interfaces/#transactional-dispatch).
+[transactional dispatch](/extending/interfaces/#transactional-dispatch).
 
 This is one reason to point `PgBoss` and `Pool` at the same database rather than separate ones.
 
@@ -161,7 +161,7 @@ await starter.start(async (job) => {
 
 A schedule stores its payload **once**, and pg-boss redelivers that same payload on every tick.
 So a key fixed at schedule time can't distinguish "this tick, redelivered" from "the next tick"
-— and since [start keys never expire](/octaflow/core/idempotency/#scope-and-lifetime), a fixed
+— and since [start keys never expire](/core/idempotency/#scope-and-lifetime), a fixed
 key would collapse every future tick into the first workflow.
 
 The start worker therefore resolves the key **per delivery**:

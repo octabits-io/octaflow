@@ -111,8 +111,8 @@ skip cascades correctly through a chain in one pass: skipping `a` skips `b`, whi
 
 Flow can pick a branch. It cannot invent a step. There is still no loop, no
 `continue-as-new`, and no way to add a node to the graph at runtime — for a runtime-sized
-*number* of parallel items use [fan-out & map](/octaflow/core/fan-out-and-map/), and for a
-genuinely different shape use a [sub-workflow](/octaflow/core/sub-workflows/).
+*number* of parallel items use [fan-out & map](/core/fan-out-and-map/), and for a
+genuinely different shape use a [sub-workflow](/core/sub-workflows/).
 
 If your process is "loop until a human approves, branching on whatever they typed", an
 imperative durable function will express it more naturally than a static DAG will.

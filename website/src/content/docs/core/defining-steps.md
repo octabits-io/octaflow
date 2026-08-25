@@ -6,11 +6,11 @@ description: defineStep and its variants for waits, maps, sub-workflows and dura
 | Helper | Use it for |
 |---|---|
 | `defineStep({ type, workflowInputSchema, outputSchema, dependencies?, handler, retry?, isRetryable?, timeoutMs?, delayMs?, waitForEvent?, compensate? })` | a normal step |
-| `defineSleepStep({ type, sleepMs, dependencies? })` | a [durable no-op delay](/octaflow/core/durable-sleep/) |
-| `defineWaitStep({ type, outputSchema, dependencies? })` | [suspend until `engine.resumeStep`](/octaflow/core/signals/) |
-| `defineMapStep({ type, workflowInputSchema, itemOutputSchema, items, each, dependencies?, itemRetry?, itemIsRetryable?, itemTimeoutMs? })` | [runtime-sized fan-out](/octaflow/core/fan-out-and-map/) |
-| `defineSubWorkflowStep({ type, workflowInputSchema, childWorkflow, input, outputSchema?, dependencies? })` | [start + await a child workflow](/octaflow/core/sub-workflows/) |
-| `defineAiStep({ ... })` | a step whose `ctx.context` is an instrumented `AiContext` ([AI add-on](/octaflow/extending/ai/)) |
+| `defineSleepStep({ type, sleepMs, dependencies? })` | a [durable no-op delay](/core/durable-sleep/) |
+| `defineWaitStep({ type, outputSchema, dependencies? })` | [suspend until `engine.resumeStep`](/core/signals/) |
+| `defineMapStep({ type, workflowInputSchema, itemOutputSchema, items, each, dependencies?, itemRetry?, itemIsRetryable?, itemTimeoutMs? })` | [runtime-sized fan-out](/core/fan-out-and-map/) |
+| `defineSubWorkflowStep({ type, workflowInputSchema, childWorkflow, input, outputSchema?, dependencies? })` | [start + await a child workflow](/core/sub-workflows/) |
+| `defineAiStep({ ... })` | a step whose `ctx.context` is an instrumented `AiContext` ([AI add-on](/extending/ai/)) |
 
 ## Keys and types are different things
 
@@ -40,7 +40,7 @@ buildWorkflow({ …, steps: { greeting: greet, shout } });      // ❌ throws:
 Note that `buildWorkflow` **throws** here rather than returning a `Result` — a malformed DAG is
 a programming error, caught at module load. The deeper checks (cycles, duplicate keys, missing
 handlers) run at start and *are* returned as a `Result`; see
-[`validateDefinition`](/octaflow/extending/interfaces/#validating-a-definition).
+[`validateDefinition`](/extending/interfaces/#validating-a-definition).
 
 ## The handler context
 
@@ -61,7 +61,7 @@ handler: async (ctx) => {
 **To fail a step, throw.** The typed handler returns the step's output; there is no
 error-return form (the `Result`-returning `StepHandler` is the untyped internal shape that
 `defineStep` wraps for you). Whether a throw is retried is decided by
-[retryability](/octaflow/core/retry-and-timeout/) — throw `retryableError(…)` or
+[retryability](/core/retry-and-timeout/) — throw `retryableError(…)` or
 `nonRetryableError(…)` to say so outright.
 
 ## Validation is a permanent failure

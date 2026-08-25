@@ -2,11 +2,15 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 
-// Served from GitHub Pages at https://octabits-io.github.io/octaflow/, so every
-// internal link has to carry the /flow base. Override with SITE / BASE when
-// hosting elsewhere (a custom domain wants base: '/').
-const site = process.env.SITE ?? 'https://octabits-io.github.io';
-const base = process.env.BASE ?? '/octaflow';
+// Served from GitHub Pages under the custom domain in public/CNAME, so the site sits
+// at the root. Internal links in the docs are root-relative to match, so BASE is only
+// really overridable together with a rewrite of those — SITE alone is the safe knob.
+const site = process.env.SITE ?? 'https://octaflow.octabits.io';
+const base = process.env.BASE ?? '/';
+
+// `base` is '/' by default but '/octaflow' on a project page — join without doubling
+// the slash, since an og:image URL is absolute and never resolved against the page.
+const socialPreview = `${site}${base.replace(/\/$/, '')}/octaflow-social-preview.png`;
 
 export default defineConfig({
   site,
@@ -28,8 +32,8 @@ export default defineConfig({
       // Share the repo's social card, so a link to the docs previews the same
       // artwork as a link to GitHub.
       head: [
-        { tag: 'meta', attrs: { property: 'og:image', content: `${site}${base}/octaflow-social-preview.png` } },
-        { tag: 'meta', attrs: { name: 'twitter:image', content: `${site}${base}/octaflow-social-preview.png` } },
+        { tag: 'meta', attrs: { property: 'og:image', content: socialPreview } },
+        { tag: 'meta', attrs: { name: 'twitter:image', content: socialPreview } },
         { tag: 'meta', attrs: { name: 'twitter:card', content: 'summary_large_image' } },
       ],
       lastUpdated: true,

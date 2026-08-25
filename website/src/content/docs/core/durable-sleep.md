@@ -52,5 +52,5 @@ it waits. Two things to keep in mind at that timescale:
 - A sleep step is an ordinary step, so it counts toward the workflow's step total and shows as
   `pending` (display state `pending`) for the whole duration. A workflow sleeping for a week
   sits in `running` for a week.
-- It is **not** swept by [`recoverStuckWorkflows`](/octaflow/running/cancellation-and-recovery/),
+- It is **not** swept by [`recoverStuckWorkflows`](/running/cancellation-and-recovery/),
   which only looks at steps stuck in `running`. A queued-but-not-yet-due step is not stuck.

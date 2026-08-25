@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/octabits-io/octaflow/actions/workflows/ci.yml/badge.svg)](https://github.com/octabits-io/octaflow/actions/workflows/ci.yml)
 [![npm](https://img.shields.io/npm/v/octaflow.svg)](https://www.npmjs.com/package/octaflow)
-[![docs](https://img.shields.io/badge/docs-octabits--io.github.io%2Fflow-16794a.svg)](https://octabits-io.github.io/octaflow/)
+[![docs](https://img.shields.io/badge/docs-octaflow.octabits.io-16794a.svg)](https://octaflow.octabits.io/)
 [![license](https://img.shields.io/npm/l/octaflow.svg)](./LICENSE)
 [![types](https://img.shields.io/badge/types-included-blue.svg)](https://www.npmjs.com/package/octaflow)
 
@@ -14,12 +14,12 @@ restart. There is
 no workflow server to operate, no control plane, and no vendor — it's a library you import,
 not a platform you adopt.
 
-### 📖 [Read the docs →](https://octabits-io.github.io/octaflow/)
+### 📖 [Read the docs →](https://octaflow.octabits.io/)
 
-[Quick start](https://octabits-io.github.io/octaflow/start/quick-start/) ·
-[Concepts](https://octabits-io.github.io/octaflow/core/concepts/) ·
-[Postgres & pg-boss](https://octabits-io.github.io/octaflow/running/postgres-and-pg-boss/) ·
-[API reference](https://octabits-io.github.io/octaflow/reference/api/)
+[Quick start](https://octaflow.octabits.io/start/quick-start/) ·
+[Concepts](https://octaflow.octabits.io/core/concepts/) ·
+[Postgres & pg-boss](https://octaflow.octabits.io/running/postgres-and-pg-boss/) ·
+[API reference](https://octaflow.octabits.io/reference/api/)
 
 ```ts
 const wf = buildWorkflow({
@@ -73,7 +73,7 @@ fails and its completed steps roll back in reverse.
   <img src="./docs/demo.svg" alt="Terminal trace of a publishing pipeline: parallel fan-out over locales and images with a concurrency cap, a retried step, a sub-workflow, a suspend-and-resume on an external event with a deadline armed, a durable sleep, a skipped branch converging on a join, then a saga rollback in reverse order" width="760">
 </p>
 
-Every line is an engine transition emitted through the [`FlowObserver`](https://octabits-io.github.io/octaflow/running/observability/) seam —
+Every line is an engine transition emitted through the [`FlowObserver`](https://octaflow.octabits.io/running/observability/) seam —
 the same one you'd point at OpenTelemetry or an events table — not a `console.log` in a handler.
 
 ```bash
@@ -106,7 +106,7 @@ workflow is expressed**.
 | **Model** | declarative — a static DAG value | imperative workflow code | imperative step functions | imperative tasks | job queue; flows are **trees** |
 | **Fan-in / diamond deps** | yes | yes | yes | yes | no — a job can't be shared by two branches |
 | **Inspect before running** | yes — the DAG is a value | no — the graph is the execution trace | no | no | yes — the flow tree is data |
-| **Web dashboard** | **none** — [build one](https://octabits-io.github.io/octaflow/running/live-progress/) | yes | yes | yes | via third-party UIs |
+| **Web dashboard** | **none** — [build one](https://octaflow.octabits.io/running/live-progress/) | yes | yes | yes | via third-party UIs |
 | **Languages** | TypeScript | polyglot SDKs | TS, Python, Go, Kotlin | TS | Node (+ ports) |
 | **Maturity** | **pre-1.0** | mature | mature | mature | mature, widely deployed |
 
@@ -120,14 +120,14 @@ that the others have earned.
 Reach for something else if:
 
 - **Your control flow is genuinely dynamic.** A declarative DAG is fixed at definition time.
-  Flow softens this a lot — [`when` guards and joins](https://octabits-io.github.io/octaflow/core/branching/) (if/else over a static graph),
-  [`defineMapStep`](https://octabits-io.github.io/octaflow/core/fan-out-and-map/) (runtime-sized fan-out),
-  [sub-workflows](https://octabits-io.github.io/octaflow/core/sub-workflows/), and [`waitForEvent`](https://octabits-io.github.io/octaflow/core/signals/) — but the
+  Flow softens this a lot — [`when` guards and joins](https://octaflow.octabits.io/core/branching/) (if/else over a static graph),
+  [`defineMapStep`](https://octaflow.octabits.io/core/fan-out-and-map/) (runtime-sized fan-out),
+  [sub-workflows](https://octaflow.octabits.io/core/sub-workflows/), and [`waitForEvent`](https://octaflow.octabits.io/core/signals/) — but the
   set of steps is still fixed up front. If your process is "**loop** until a human approves,
   branching on whatever they typed," an imperative durable function will express it more
   naturally: Flow can pick a branch, not invent a step.
 - **You want a UI out of the box.** Flow ships a wire-safe projection
-  ([`toPublicWorkflow`](https://octabits-io.github.io/octaflow/extending/http/)) and lifecycle events, not a
+  ([`toPublicWorkflow`](https://octaflow.octabits.io/extending/http/)) and lifecycle events, not a
   dashboard. You build it.
 - **You need non-TypeScript workers.** The DAG and its schemas are TypeScript values.
 - **You can't run Postgres**, or you need throughput past what a Postgres-backed queue gives you.
@@ -239,25 +239,25 @@ pnpm add ai @ai-sdk/provider
 ## Documentation
 
 Full docs — concepts, every feature, production wiring and the API reference — live at
-**[octabits-io.github.io/octaflow](https://octabits-io.github.io/octaflow/)**.
+**[octaflow.octabits.io](https://octaflow.octabits.io/)**.
 
 | | |
 |---|---|
-| [Quick start](https://octabits-io.github.io/octaflow/start/quick-start/) | a runnable workflow in one file, no database |
-| [Concepts](https://octabits-io.github.io/octaflow/core/concepts/) | step, workflow, registry, store, dispatcher, engine, partition |
-| [Defining steps](https://octabits-io.github.io/octaflow/core/defining-steps/) | `defineStep` and its variants |
-| [Retry & timeout](https://octabits-io.github.io/octaflow/core/retry-and-timeout/) | attempt budgets, backoff, and how a failure is classified |
-| [Fan-out & map](https://octabits-io.github.io/octaflow/core/fan-out-and-map/) | one child step per item of a runtime list |
-| [Branching](https://octabits-io.github.io/octaflow/core/branching/) | `when` guards and join rules — if/else over a static DAG |
-| [Signals](https://octabits-io.github.io/octaflow/core/signals/) · [Sub-workflows](https://octabits-io.github.io/octaflow/core/sub-workflows/) · [Saga](https://octabits-io.github.io/octaflow/core/saga-compensation/) | suspend, nest, and roll back |
-| [Deadlines](https://octabits-io.github.io/octaflow/core/deadlines/) | budgets for a suspended step and for a whole run |
-| [Heartbeats](https://octabits-io.github.io/octaflow/core/heartbeats/) | liveness for long steps, and interrupting one that was cancelled |
-| [Postgres & pg-boss](https://octabits-io.github.io/octaflow/running/postgres-and-pg-boss/) | production wiring, workers, DLQ, cron |
-| [Cancellation & recovery](https://octabits-io.github.io/octaflow/running/cancellation-and-recovery/) | cancelling a run, sweeping steps a crash left behind, and retrying a failed run |
-| [Observability](https://octabits-io.github.io/octaflow/running/observability/) · [Live progress](https://octabits-io.github.io/octaflow/running/live-progress/) | lifecycle events, spans, and streaming them to a browser |
-| [The AI add-on](https://octabits-io.github.io/octaflow/extending/ai/) | token/cost capture, quota, usage rollups |
-| [Extending](https://octabits-io.github.io/octaflow/extending/interfaces/) | custom stores, dispatchers and gates |
-| [API reference](https://octabits-io.github.io/octaflow/reference/api/) | every export, by entry point |
+| [Quick start](https://octaflow.octabits.io/start/quick-start/) | a runnable workflow in one file, no database |
+| [Concepts](https://octaflow.octabits.io/core/concepts/) | step, workflow, registry, store, dispatcher, engine, partition |
+| [Defining steps](https://octaflow.octabits.io/core/defining-steps/) | `defineStep` and its variants |
+| [Retry & timeout](https://octaflow.octabits.io/core/retry-and-timeout/) | attempt budgets, backoff, and how a failure is classified |
+| [Fan-out & map](https://octaflow.octabits.io/core/fan-out-and-map/) | one child step per item of a runtime list |
+| [Branching](https://octaflow.octabits.io/core/branching/) | `when` guards and join rules — if/else over a static DAG |
+| [Signals](https://octaflow.octabits.io/core/signals/) · [Sub-workflows](https://octaflow.octabits.io/core/sub-workflows/) · [Saga](https://octaflow.octabits.io/core/saga-compensation/) | suspend, nest, and roll back |
+| [Deadlines](https://octaflow.octabits.io/core/deadlines/) | budgets for a suspended step and for a whole run |
+| [Heartbeats](https://octaflow.octabits.io/core/heartbeats/) | liveness for long steps, and interrupting one that was cancelled |
+| [Postgres & pg-boss](https://octaflow.octabits.io/running/postgres-and-pg-boss/) | production wiring, workers, DLQ, cron |
+| [Cancellation & recovery](https://octaflow.octabits.io/running/cancellation-and-recovery/) | cancelling a run, sweeping steps a crash left behind, and retrying a failed run |
+| [Observability](https://octaflow.octabits.io/running/observability/) · [Live progress](https://octaflow.octabits.io/running/live-progress/) | lifecycle events, spans, and streaming them to a browser |
+| [The AI add-on](https://octaflow.octabits.io/extending/ai/) | token/cost capture, quota, usage rollups |
+| [Extending](https://octaflow.octabits.io/extending/interfaces/) | custom stores, dispatchers and gates |
+| [API reference](https://octaflow.octabits.io/reference/api/) | every export, by entry point |
 
 ---
 

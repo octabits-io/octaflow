@@ -68,7 +68,7 @@ the child must share the parent's `TContext`.
    so a child that finishes immediately always finds its parent suspended.)
 3. The child runs as a full workflow of its own: its own row, its own steps, its own retries,
    its own event stream. It carries `parentWorkflowId` / `parentStepId` linkage — which the
-   [public view](/octaflow/extending/http/) strips.
+   [public view](/extending/http/) strips.
 4. When the child reaches a terminal state, the engine bridges it: `completed` completes the
    parent step with the child's output; `failed` or `cancelled` fails it with a
    `Sub-workflow failed: …` message.
@@ -86,4 +86,4 @@ The bridge is idempotent — it does nothing unless the parent step is still `wa
   effects survive a parent failure unless you compensate them.
 - **Sub-workflow starts are not yet transactional.** Unlike `startWorkflow` and step completion,
   this path still writes then enqueues — see
-  [transactional dispatch](/octaflow/extending/interfaces/#transactional-dispatch).
+  [transactional dispatch](/extending/interfaces/#transactional-dispatch).

@@ -4,7 +4,7 @@ description: Let a long step prove it is alive, so a dead one can be caught in s
 ---
 
 Without a heartbeat, `startedAt` is the only liveness signal the engine has. The
-[sweeper](/octaflow/running/cancellation-and-recovery/) asks "did this step start longer ago
+[sweeper](/running/cancellation-and-recovery/) asks "did this step start longer ago
 than the stuck threshold", and has to read that as "is the worker dead". Those are different
 questions, and one number cannot answer both:
 
@@ -37,7 +37,7 @@ long-running case.
 
 ## Why this matters more since crashed steps are re-queued
 
-`recoverStuckWorkflows` now [re-queues a crashed step](/octaflow/running/cancellation-and-recovery/)
+`recoverStuckWorkflows` now [re-queues a crashed step](/running/cancellation-and-recovery/)
 rather than failing it. That makes a *false* positive more expensive than it used to be: the
 sweeper marks the step `pending` and enqueues it while the original invocation is **still
 running**, so a worker claims it and the handler executes twice, concurrently. The atomic claim
@@ -65,7 +65,7 @@ It resolves `false` when the step is no longer this invocation's, which means on
 things, all of which mean *stop*:
 
 - the workflow was **cancelled**;
-- it blew its [deadline](/octaflow/core/deadlines/);
+- it blew its [deadline](/core/deadlines/);
 - the **sweeper re-queued this step**, and someone else now owns it.
 
 The engine does two things on a `false`, whether it came from your call or from the automatic
@@ -80,7 +80,7 @@ loop iteration is fine.
 :::note[Not a substitute for `timeoutMs`]
 Under the default `heartbeat: 'auto'`, a handler stuck in an infinite loop still beats happily
 forever — the engine's timer knows the process is alive, not that the work is going anywhere.
-A per-step [`timeoutMs`](/octaflow/core/retry-and-timeout/) is what bounds a hang. The two are
+A per-step [`timeoutMs`](/core/retry-and-timeout/) is what bounds a hang. The two are
 complementary: `timeoutMs` bounds total work, the heartbeat bounds silence.
 
 Set `heartbeat: 'manual'` to suppress the automatic timer, and silence then means a hung
@@ -106,7 +106,7 @@ at least as often as your shortest window if you want the number to mean anythin
 
 Each beat is one `UPDATE` on `flow_workflow_step`, and each needs a store connection for its
 brief life — the same budgeting note as
-[worker concurrency](/octaflow/running/postgres-and-pg-boss/).
+[worker concurrency](/running/postgres-and-pg-boss/).
 
 The Postgres store adds `heartbeat_at` to `flow_workflow_step`. `flowStoreDdl()` emits an
 `ALTER TABLE … ADD COLUMN IF NOT EXISTS` alongside the `CREATE TABLE`, so re-applying the DDL

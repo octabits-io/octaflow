@@ -5,7 +5,7 @@ description: Stream workflow transitions to a browser over SSE by composing the 
 
 Octaflow ships no dashboard. It ships the two seams you need to build one:
 
-- **[`toPublicWorkflow()`](/octaflow/extending/http/)** — the read side. Fetch the current
+- **[`toPublicWorkflow()`](/extending/http/)** — the read side. Fetch the current
   state of a workflow, wire-safe.
 - **`FlowObserver`** — the live side. Every transition, as it happens.
 
@@ -139,7 +139,7 @@ since the database is already there. Two things bite:
 
 `NOTIFY` is not durable, and neither is this hub: a client that was disconnected missed
 those events for good. If catching up matters, pair the live stream with the persisted
-history from [`octaflow/store-pg`](/octaflow/running/postgres-and-pg-boss/):
+history from [`octaflow/store-pg`](/running/postgres-and-pg-boss/):
 
 ```ts
 import { createPgEventSink, readFlowEvents } from 'octaflow/store-pg';

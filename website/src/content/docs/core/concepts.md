@@ -50,8 +50,8 @@ independent branches — they run to completion first, and only then does the wo
 finishes.
 :::
 
-Once `failed`, the engine runs [saga compensation](/octaflow/core/saga-compensation/) over the
+Once `failed`, the engine runs [saga compensation](/core/saga-compensation/) over the
 completed steps, then bridges the failure to a parent step if this workflow is a
-[sub-workflow](/octaflow/core/sub-workflows/) child. A workflow can also be ended deliberately
-with [`cancelWorkflow`](/octaflow/running/cancellation-and-recovery/), which skips pending and
+[sub-workflow](/core/sub-workflows/) child. A workflow can also be ended deliberately
+with [`cancelWorkflow`](/running/cancellation-and-recovery/), which skips pending and
 waiting steps but does **not** compensate.

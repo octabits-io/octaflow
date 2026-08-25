@@ -77,6 +77,6 @@ the failure finalization, and a step already marked `compensating` is not retrie
 ## How it surfaces
 
 `compensating` folds to the display state `running` and `compensated` to `skipped` in the
-[public view](/octaflow/extending/http/) — a rolled-back step reads as "didn't happen", with the
+[public view](/extending/http/) — a rolled-back step reads as "didn't happen", with the
 failure reported by the step that actually failed. Watch the `step.compensating` /
-`step.compensated` [events](/octaflow/running/observability/) if you need the real states.
+`step.compensated` [events](/running/observability/) if you need the real states.

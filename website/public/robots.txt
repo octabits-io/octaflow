@@ -1,0 +1,6 @@
+# Served from the site root (see public/CNAME) — a robots.txt under a github.io
+# project path would be ignored, which is why the docs have their own domain.
+User-agent: *
+Allow: /
+
+Sitemap: https://octaflow.octabits.io/sitemap-index.xml

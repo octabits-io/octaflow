@@ -89,9 +89,9 @@ A handler that throws is caught by `defineStep` and turned into a step failure, 
 the **first** column — the queue never sees it. The second column is for failures *around* the
 handler: the store is unreachable, the process is killed, the worker itself throws. That's why
 production wiring needs a
-[DLQ worker](/octaflow/running/postgres-and-pg-boss/): without one, a job that exhausts its
+[DLQ worker](/running/postgres-and-pg-boss/): without one, a job that exhausts its
 queue retries leaves its step stuck in `running` until the
-[stuck-step sweeper](/octaflow/running/cancellation-and-recovery/) picks it up.
+[stuck-step sweeper](/running/cancellation-and-recovery/) picks it up.
 
-Being deferred by the [step gate](/octaflow/core/concurrency-and-rate-limits/) is neither: a
+Being deferred by the [step gate](/core/concurrency-and-rate-limits/) is neither: a
 throttled step is re-enqueued without consuming an attempt from either budget.

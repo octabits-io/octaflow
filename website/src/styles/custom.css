@@ -125,7 +125,7 @@ body::before {
  */
 .site-title svg,
 header svg.starlight-logo,
-a[href$='/octaflow/'] > svg {
+a[href='/'] > svg {
   color: var(--sl-color-accent-high);
 }
 

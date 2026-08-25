@@ -20,9 +20,9 @@ Runnable, focused examples live in [`examples/`](https://github.com/octabits-io/
 | 11 | `11-observability.ts` | observer events + tracer spans |
 | 12 | `12-postgres-pgboss-production.ts` | full pg store + gate + event sink + pg-boss + cron |
 | 13 | `13-ai-workflow.ts` | AI add-on (instrumented model + cost) |
-| 14 | `14-live-progress.ts` | `FlowObserver` → SSE fan-out ([build your own dashboard](/octaflow/running/live-progress/)) |
-| 15 | `15-conditional-branching.ts` | [`when` guards + a `join: 'any'` convergence](/octaflow/core/branching/) |
-| 16 | `16-deadlines-and-retry.ts` | [wait deadlines, run deadlines](/octaflow/core/deadlines/), [`retryWorkflow`](/octaflow/running/cancellation-and-recovery/#retrying-a-failed-run), and [heartbeats](/octaflow/core/heartbeats/) |
+| 14 | `14-live-progress.ts` | `FlowObserver` → SSE fan-out ([build your own dashboard](/running/live-progress/)) |
+| 15 | `15-conditional-branching.ts` | [`when` guards + a `join: 'any'` convergence](/core/branching/) |
+| 16 | `16-deadlines-and-retry.ts` | [wait deadlines, run deadlines](/core/deadlines/), [`retryWorkflow`](/running/cancellation-and-recovery/#retrying-a-failed-run), and [heartbeats](/core/heartbeats/) |
 
 The in-memory examples (01–11, 14–16) share a small driver, [`examples/runtime.ts`](https://github.com/octabits-io/octaflow/blob/main/examples/runtime.ts),
 that builds an engine over the in-memory store and an in-process queue you drain. Its queue

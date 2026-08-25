@@ -20,9 +20,9 @@ const engine = createWorkflowEngine({ store, dispatcher, registry, partitionKey,
   and **metrics** (feed OTel counters/histograms).
 
   Two are worth wiring to an alert rather than a chart. `workflow.retried` means an operator
-  reached for [`retryWorkflow`](/octaflow/running/cancellation-and-recovery/#retrying-a-failed-run)
+  reached for [`retryWorkflow`](/running/cancellation-and-recovery/#retrying-a-failed-run)
   — a run got far enough to fail. `step.timedOut` means a suspended step hit its
-  [wait deadline](/octaflow/core/deadlines/); it is always followed by the event for what the
+  [wait deadline](/core/deadlines/); it is always followed by the event for what the
   policy did, `step.failed` or `step.completed`, so count the pair rather than assuming which.
 - **`FlowTracer`** wraps each step execution in a `flow.step` span (records the error on failure).
   An OpenTelemetry adapter is a ~10-line `startSpan` shim.

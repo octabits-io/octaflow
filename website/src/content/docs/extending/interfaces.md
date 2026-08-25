@@ -46,7 +46,7 @@ wrong degrades a number rather than the engine.
 Persisting a transition and enqueueing the jobs it unlocks are two writes. A crash between
 them — an ordinary deploy is enough — leaves steps `pending` with no job behind them: a
 workflow stalled forever, and invisible to
-[`recoverStuckWorkflows`](/octaflow/running/cancellation-and-recovery/), which only looks at
+[`recoverStuckWorkflows`](/running/cancellation-and-recovery/), which only looks at
 steps stuck in `running`.
 
 Two **optional** capabilities close that window. Implement both and the engine commits the
