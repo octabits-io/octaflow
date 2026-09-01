@@ -1,4 +1,4 @@
-# @octabits-io/flow
+# octaflow
 
 ## 0.17.0
 
