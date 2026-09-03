@@ -40,6 +40,21 @@ export interface Dispatcher {
   enqueueStep(payload: DispatchStepPayload, options?: EnqueueOptions): Promise<Result<void, FlowErrorShape>>;
 
   /**
+   * **Optional capability.** Whatever the dispatcher must do *outside* a store
+   * transaction before it can enqueue inside one — queue DDL, warming a queue
+   * cache. The engine calls it once, before its first transactional dispatch,
+   * and never while a transaction is open.
+   *
+   * Why it exists: a dispatcher that lazily creates its queue on first enqueue
+   * does so on its own connection. On a multi-connection database that merely
+   * costs a second connection; on a single-connection database (an embedded
+   * PGlite) it deadlocks — the transaction holds the only connection and waits
+   * for a query that waits for the transaction. `prepare` moves that work to
+   * where no transaction is open.
+   */
+  prepare?(): Promise<Result<void, FlowErrorShape>>;
+
+  /**
    * **Optional capability.** Enqueue inside the caller's store transaction, so
    * the job and the state change that produced it commit together.
    *

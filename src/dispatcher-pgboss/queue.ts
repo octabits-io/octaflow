@@ -7,8 +7,15 @@ function dlqName(queueName: string): string {
 }
 
 /**
- * Create the step queue and its dead-letter queue (idempotent). Call once at
- * startup; the dispatcher also calls it lazily on first enqueue.
+ * Create the step queue and its dead-letter queue if they do not exist. Call
+ * once at startup; the dispatcher also runs it from `prepare` and lazily on a
+ * plain first enqueue.
+ *
+ * Only what is missing is created: pg-boss's `createQueue` evicts the queue's
+ * entry from its per-instance cache, and a `send` that misses that cache reads
+ * the queue on pg-boss's *own* connection — inside a store transaction on a
+ * single-connection database that is a deadlock. An existing queue is left
+ * alone, cache entry and all.
  */
 export async function ensureStepQueue(boss: PgBoss, queueName: string, config: StepQueueConfig = {}): Promise<void> {
   const cfg = { ...DEFAULT_STEP_QUEUE_CONFIG, ...config };
@@ -19,20 +26,24 @@ export async function ensureStepQueue(boss: PgBoss, queueName: string, config: S
     throw error;
   };
 
-  try {
-    await boss.createQueue(dlq, { retryLimit: 0 });
-  } catch (e) {
-    swallowExists(e);
+  if (!(await boss.getQueue(dlq))) {
+    try {
+      await boss.createQueue(dlq, { retryLimit: 0 });
+    } catch (e) {
+      swallowExists(e);
+    }
   }
-  try {
-    await boss.createQueue(queueName, {
-      retryLimit: cfg.retryLimit,
-      retryDelay: cfg.retryDelay,
-      expireInSeconds: cfg.expireInSeconds,
-      deadLetter: dlq,
-    });
-  } catch (e) {
-    swallowExists(e);
+  if (!(await boss.getQueue(queueName))) {
+    try {
+      await boss.createQueue(queueName, {
+        retryLimit: cfg.retryLimit,
+        retryDelay: cfg.retryDelay,
+        expireInSeconds: cfg.expireInSeconds,
+        deadLetter: dlq,
+      });
+    } catch (e) {
+      swallowExists(e);
+    }
   }
 }
 
@@ -48,11 +59,48 @@ export interface PgBossDispatcherDeps {
   config?: StepQueueConfig;
 }
 
+/** A job id that cannot exist — see {@link fillQueueCache}. */
+const NIL_JOB_ID = '00000000-0000-0000-0000-000000000000';
+
+/**
+ * pg-boss keeps a per-instance cache of queue rows and consults it on every
+ * `send` — on a miss it reads the queue on its *own* connection, whatever `db`
+ * the send was handed. `createQueue` evicts the entry rather than filling it,
+ * and the `PgBoss` facade keeps the cache private. So after creating our queue
+ * we fill the entry here, outside any transaction, through the one public call
+ * that reads the queue via the cache and then changes nothing: cancelling a job
+ * id that cannot exist. (A boss that does expose `getQueueCache` — a bare
+ * manager — is asked directly.) Without this the first transactional send would
+ * read on a second connection — a deadlock on a single-connection database.
+ */
+async function fillQueueCache(boss: PgBoss, queueName: string): Promise<void> {
+  const cache = (boss as unknown as { getQueueCache?: (name: string) => Promise<unknown> }).getQueueCache;
+  if (typeof cache === 'function') await cache.call(boss, queueName);
+  else await boss.cancel(queueName, NIL_JOB_ID);
+}
+
 /** A flow-core `Dispatcher` backed by pg-boss. */
 export function createPgBossDispatcher(deps: PgBossDispatcherDeps): Dispatcher {
   const { boss, queueName, partitionKey } = deps;
   const cfg = { ...DEFAULT_STEP_QUEUE_CONFIG, ...deps.config };
-  let ensured = false;
+
+  /**
+   * Queue DDL and cache warm, once. Memoised as a promise so concurrent first
+   * sends share it; cleared on failure so the next attempt retries. The engine
+   * calls this through `prepare` before its first transaction; a direct
+   * `enqueueStep` outside any transaction is free to trigger it lazily.
+   */
+  let prepared: Promise<void> | null = null;
+  function ensurePrepared(): Promise<void> {
+    prepared ??= (async () => {
+      await ensureStepQueue(boss, queueName, cfg);
+      await fillQueueCache(boss, queueName);
+    })().catch((error: unknown) => {
+      prepared = null;
+      throw error;
+    });
+    return prepared;
+  }
 
   /**
    * Adapt flow's `SqlExecutor` to the shape pg-boss wants for a caller-supplied
@@ -75,12 +123,12 @@ export function createPgBossDispatcher(deps: PgBossDispatcherDeps): Dispatcher {
       if (!parsed.success) {
         return { ok: false, error: { key: 'queue_error', message: `Invalid step payload: ${parsed.error.message}` } };
       }
-      if (!ensured) {
-        // Queue creation is DDL — never inside the caller's transaction, where a
-        // rollback would undo it and a lock could outlive the send.
-        await ensureStepQueue(boss, queueName, cfg);
-        ensured = true;
-      }
+      // Queue creation is DDL — never inside the caller's transaction, where a
+      // rollback would undo it and a lock could outlive the send. With a
+      // transaction handle this is expected to be a no-op already: the engine
+      // ran `prepare` first. (On a single-connection database, reaching it here
+      // with an open transaction would deadlock — which is why `prepare` exists.)
+      await ensurePrepared();
       const startAfter = options?.startAfterSeconds;
       const db = handle === undefined ? undefined : asPgBossDb(handle);
       if (handle !== undefined && !db) {
@@ -103,6 +151,15 @@ export function createPgBossDispatcher(deps: PgBossDispatcherDeps): Dispatcher {
   }
 
   return {
+    /** Queue DDL + cache fill, outside any transaction. See `Dispatcher.prepare`. */
+    async prepare() {
+      try {
+        await ensurePrepared();
+        return { ok: true, value: undefined };
+      } catch (error) {
+        return { ok: false, error: { key: 'queue_error', message: error instanceof Error ? error.message : 'Failed to prepare step queue' } };
+      }
+    },
     enqueueStep: (payload, options) => send(payload, options),
     /**
      * Enqueue on the store's open transaction, so the job and the state change

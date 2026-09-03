@@ -225,15 +225,35 @@ export function createWorkflowEngine<TContext = unknown>(deps: WorkflowEngineDep
     typeof store.runInTransaction === 'function' && typeof dispatcher.enqueueStepIn === 'function';
 
   /**
+   * The dispatcher's one-time setup (`Dispatcher.prepare`), run before the first
+   * transaction opens and never inside one. Memoised as a promise so concurrent
+   * first dispatches share it; cleared on failure so the next attempt retries.
+   */
+  let prepared: Promise<void> | null = null;
+  function ensurePrepared(): Promise<void> {
+    if (!dispatcher.prepare) return Promise.resolve();
+    prepared ??= dispatcher.prepare().then((result) => {
+      if (!result.ok) throw new Error(`Dispatcher failed to prepare: ${result.error.message}`);
+    }).catch((error: unknown) => {
+      prepared = null;
+      throw error;
+    });
+    return prepared;
+  }
+
+  /**
    * Run `fn` atomically when both halves support it, otherwise run it directly.
    * `fn` receives the scope to write through — pass it to `dispatchReadyStep`.
    *
    * Only writes and enqueues belong in here. Anything that can run user code
    * (saga compensation, hooks) must stay outside, or a rollback handler making a
-   * network call would hold a database transaction open while it does.
+   * network call would hold a database transaction open while it does. The
+   * dispatcher's own setup is the same kind of thing — it runs before the
+   * transaction, not in it (see `Dispatcher.prepare`).
    */
   async function withDispatchScope<T>(fn: (scope?: TransactionalScope) => Promise<T>): Promise<T> {
     if (!atomicDispatch) return fn(undefined);
+    await ensurePrepared();
     return store.runInTransaction!((scope) => fn(scope));
   }
 

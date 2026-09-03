@@ -1610,6 +1610,51 @@ describe('atomic dispatch (capability negotiation)', () => {
     expect(usedTransactionalPath).toEqual([true]);
   });
 
+  it('runs the dispatcher\'s prepare once, before the first transaction opens, and shares it across dispatches', async () => {
+    const inner = createInMemoryWorkflowStore();
+    const store = withTransaction(inner);
+    const registry = createStepHandlerRegistry<Ctx>();
+    const prepareCalls: boolean[] = [];
+    const dispatcher: Dispatcher = {
+      async prepare() { prepareCalls.push(store.isOpen()); return { ok: true, value: undefined }; },
+      async enqueueStep() { return { ok: true, value: undefined }; },
+      async enqueueStepIn() { return { ok: true, value: undefined }; },
+    };
+    const wf = singleStep('atomic:prepare');
+    const engine = createWorkflowEngine<Ctx>({ store, registry, dispatcher, partitionKey: 'test' });
+    wf.register(registry);
+
+    await Promise.all([wf.start(engine, {}), wf.start(engine, {})]);
+    await wf.start(engine, {});
+
+    // Once for the engine's lifetime, and with no transaction open — the whole
+    // point: queue DDL on a single-connection database would deadlock inside one.
+    expect(prepareCalls).toEqual([false]);
+  });
+
+  it('fails the dispatch, and retries prepare next time, when prepare fails', async () => {
+    const store = withTransaction(createInMemoryWorkflowStore());
+    const registry = createStepHandlerRegistry<Ctx>();
+    let attempts = 0;
+    const dispatcher: Dispatcher = {
+      async prepare() {
+        attempts += 1;
+        return attempts === 1
+          ? { ok: false, error: { key: 'queue_error', message: 'queue DDL refused' } }
+          : { ok: true, value: undefined };
+      },
+      async enqueueStep() { return { ok: true, value: undefined }; },
+      async enqueueStepIn() { return { ok: true, value: undefined }; },
+    };
+    const wf = singleStep('atomic:prepare-fails');
+    const engine = createWorkflowEngine<Ctx>({ store, registry, dispatcher, partitionKey: 'test' });
+    wf.register(registry);
+
+    await expect(wf.start(engine, {})).rejects.toThrow('queue DDL refused');
+    await expect(wf.start(engine, {})).resolves.toMatchObject({ ok: true });
+    expect(attempts).toBe(2);
+  });
+
   it('surfaces an enqueue failure instead of stranding the workflow', async () => {
     const store = withTransaction(createInMemoryWorkflowStore());
     const registry = createStepHandlerRegistry<Ctx>();
