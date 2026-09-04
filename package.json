@@ -1,6 +1,6 @@
 {
   "name": "octaflow",
-  "version": "0.17.1",
+  "version": "0.17.2",
   "description": "Durable DAG workflow engine: Zod-typed steps over Postgres + pg-boss, with an optional AI add-on (token/cost/quota). Layered single package.",
   "license": "MIT",
   "type": "module",
